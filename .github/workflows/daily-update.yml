@@ -1,0 +1,27 @@
+name: Daily Update (22f3001706@ds.study.iitm.ac.in)
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Runs daily at 9:00 AM UTC (specific hour/minute, no wildcards)
+  workflow_dispatch:      # Allows manual testing
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update status file (22f3001706@ds.study.iitm.ac.in)
+        run: |
+          echo "Last updated: $(date -u)" > STATUS.md
+
+      - name: Commit changes
+        run: |
+          git config user.name "Daily Bot"
+          git config user.email "22f3001706@ds.study.iitm.ac.in"
+          git add STATUS.md
+          git commit -m "Daily automated update: $(date -u) [22f3001706@ds.study.iitm.ac.in]" || echo "No changes"
+          git push
