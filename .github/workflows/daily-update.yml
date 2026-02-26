@@ -2,8 +2,11 @@ name: Daily Update (22f3001706@ds.study.iitm.ac.in)
 
 on:
   schedule:
-    - cron: '0 9 * * *'  # Runs daily at 9:00 AM UTC (specific hour/minute, no wildcards)
-  workflow_dispatch:      # Allows manual testing
+    - cron: '0 9 * * *'  # Daily at 9:00 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write  # Explicitly allows push
 
 jobs:
   update:
@@ -13,15 +16,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Full history if needed
 
       - name: Update status file (22f3001706@ds.study.iitm.ac.in)
         run: |
-          echo "Last updated: $(date -u)" > STATUS.md
+          TIMESTAMP=$(date -u)
+          echo "# Daily Status Update" > STATUS.md
+          echo "## Last run: $TIMESTAMP" >> STATUS.md
+          echo "## Email: 22f3001706@ds.study.iitm.ac.in" >> STATUS.md
 
-      - name: Commit changes
+      - name: Commit and push changes
         run: |
-          git config user.name "Daily Bot"
+          git config user.name "Daily Bot (22f3001706@ds.study.iitm.ac.in)"
           git config user.email "22f3001706@ds.study.iitm.ac.in"
           git add STATUS.md
-          git commit -m "Daily automated update: $(date -u) [22f3001706@ds.study.iitm.ac.in]" || echo "No changes"
-          git push
+          git commit -m "Daily automated update: $(date -u) [skip ci]" || exit 0
+          git push origin HEAD:main  # Explicit push to main
